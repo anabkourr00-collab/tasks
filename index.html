@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Master</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif;}
+        body{background:linear-gradient(145deg,#667eea,#764ba2);color:#1e1e2f;min-height:100vh;transition:all .3s;}
+        body.dark-mode{background:#0a0a0f;color:#fff;}
+        body.dark-mode .app-container{background:rgba(0,0,0,.95);}
+        body.dark-mode .main-content{background:#0f0f15;color:#fff;}
+        body.dark-mode .nav-bar{background:#0a0a12;border-left-color:#2a2a3a;}
+        body.dark-mode .sub-mission-card{background:#1a1a24;border-color:#2a2a3a;color:#fff;}
+        body.dark-mode .add-mission-panel{background:#1a1a24;color:#fff;}
+        body.dark-mode .form-control{background:#2a2a3a;color:#fff;border-color:#3a3a4a;}
+        body.dark-mode .modal-content{background:#1a1a24;color:#fff;}
+        body.dark-mode .settings-group{background:#1a1a24;}
+        body.dark-mode .alarm-panel{background:#1a1a24;border-color:#2a2a3a;color:#fff;}
+        body.dark-mode .notifications-panel{background:#1a1a24;border-color:#2a2a3a;}
+        body.dark-mode .profile-card{background:#1a1a24;color:#fff;}
+        body.dark-mode .info-row{background:#2a2a3a;}
+        body.dark-mode .meta-tag{background:#2a2a3a;color:#fff;}
+        body.dark-mode .subtask-item{background:#2a2a3a;}
+        body.dark-mode .action-btn{background:#2a2a3a;color:#fff;}
+        body.dark-mode .progress-indicator{background:#1a1a24;}
+        body.dark-mode .category-header{background:rgba(102,126,234,.2);color:#fff;}
+        body.dark-mode .main-missions-header{background:rgba(102,126,234,.1);color:#fff;}
+        body.dark-mode .settings-item{color:#e0e0e0;}
+        body.dark-mode .deadline-badge{background:#ff6b6b30;color:#ff8a8a;}
+        body.dark-mode .completed-card{background:#1a1a24;color:#fff;}
+        body.dark-mode .stat-value{color:#48dbfb;}
+        body.dark-mode .profile-name{color:#fff;}
+        .app-container{display:flex;min-height:100vh;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);}
+        .nav-bar{width:280px;background:#fff;padding:80px 20px 30px;position:fixed;right:-280px;top:0;bottom:0;z-index:1000;transition:right .4s;border-left:1px solid #eee;overflow-y:auto;}
+        .nav-bar.open{right:0;}
+        .top-bar{position:fixed;top:20px;right:20px;display:flex;gap:10px;z-index:1001;}
+        .top-btn{width:50px;height:50px;border-radius:12px;background:linear-gradient(145deg,#667eea,#764ba2);border:none;color:#fff;font-size:1.5rem;cursor:pointer;box-shadow:0 4px 15px rgba(102,126,234,.4);transition:all .3s;}
+        .top-btn:hover{transform:scale(1.1);}
+        .nav-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:15px;border-bottom:2px solid #667eea;cursor:pointer;}
+        .logo{display:flex;align-items:center;gap:10px;font-size:1.3rem;font-weight:700;background:linear-gradient(145deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+        .user-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(145deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;transition:all .3s;}
+        .user-avatar:hover{transform:scale(1.1);}
+        .user-name-small{text-align:center;color:#667eea;font-weight:600;margin-bottom:20px;}
+        .mission-category{margin-bottom:15px;}
+        .category-header{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(102,126,234,.1);border-radius:12px;cursor:pointer;color:#667eea;border:1px solid #667eea30;}
+        .category-header i{transition:transform .3s;}
+        .category-header.open i{transform:rotate(180deg);}
+        .category-content{max-height:0;overflow:hidden;transition:max-height .3s ease-out;padding-right:15px;}
+        .category-content.open{max-height:500px;transition:max-height .5s ease-in;}
+        .main-missions-section{margin:10px 0;padding-right:15px;border-right:2px solid #667eea30;}
+        .main-missions-header{display:flex;justify-content:space-between;padding:8px;background:rgba(102,126,234,.05);border-radius:8px;cursor:pointer;color:#667eea;}
+        .main-missions-header i{transition:transform .3s;}
+        .main-missions-header.open i{transform:rotate(180deg);}
+        .main-missions-content{max-height:0;overflow:hidden;transition:max-height .3s ease-out;}
+        .main-missions-content.open{max-height:300px;transition:max-height .5s ease-in;}
+        .main-mission-item{display:flex;align-items:center;gap:8px;padding:8px;background:rgba(102,126,234,.03);border-radius:8px;margin:5px 0;}
+        .main-mission-title{flex:1;cursor:pointer;font-size:.9rem;}
+        .main-mission-count{background:rgba(102,126,234,.1);padding:2px 6px;border-radius:12px;font-size:.75rem;}
+        .complete-main-mission{color:#48dbfb;cursor:pointer;opacity:.7;font-size:1.1rem;transition:all .3s;}
+        .complete-main-mission:hover{opacity:1;transform:scale(1.2);}
+        .delete-main-mission{color:#ff6b6b;cursor:pointer;opacity:.5;transition:all .3s;}
+        .delete-main-mission:hover{opacity:1;transform:scale(1.2);}
+        .category-add-btn{padding:8px;border:1px dashed #667eea;border-radius:8px;text-align:center;color:#667eea;cursor:pointer;margin:5px 0;transition:all .3s;}
+        .category-add-btn:hover{background:rgba(102,126,234,.1);}
+        .show-completed-btn{padding:12px;border:1px solid #667eea;border-radius:12px;text-align:center;color:#667eea;margin:15px 0;cursor:pointer;transition:all .3s;}
+        .show-completed-btn:hover{background:#667eea;color:#fff;}
+        .settings-section{margin-top:auto;padding-top:20px;border-top:2px solid #667eea;}
+        .settings-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:12px;cursor:pointer;color:#666;transition:all .3s;}
+        .settings-item:hover{background:rgba(102,126,234,.1);transform:translateX(-5px);}
+        .settings-item i{width:25px;color:#667eea;}
+        .main-content{flex:1;background:#fff;margin:20px;border-radius:30px;padding:30px;overflow-y:auto;transition:all .4s;}
+        .page{display:none;animation:fadeIn .4s;}
+        .page.active{display:block;}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+        .page-header{background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;padding:20px;border-radius:20px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;}
+        .page-header h1{font-size:2rem;display:flex;align-items:center;gap:15px;}
+        .back-btn{width:45px;height:45px;border-radius:12px;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:1.2rem;cursor:pointer;transition:all .3s;}
+        .back-btn:hover{background:rgba(255,255,255,.3);transform:scale(1.1);}
+        .add-mission-panel{background:#fff;border-radius:25px;padding:30px;max-width:600px;margin:0 auto 30px;box-shadow:0 10px 30px rgba(0,0,0,.1);}
+        .add-mission-panel.hidden{display:none;}
+        .add-mission-panel {
+    background: #fff;  /* خلفية بيضاء ثابتة */
+    border-radius: 25px;
+    padding: 30px;
+    max-width: 600px;
+    margin: 0 auto 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.1);
+    position: relative;
+    z-index: 1000;  /* ترفع الفورم فوق كل حاجة */
+    opacity: 1;
+    backdrop-filter: none;
+}
+
+/* للوضع الليلي */
+body.dark-mode .add-mission-panel {
+    background: #1a1a24;  /* خلفية داكنة ثابتة */
+}
+        .form-group{margin-bottom:20px;}
+        .form-group label{display:block;margin-bottom:8px;font-weight:600;color:#667eea;}
+        .form-control{width:100%;padding:12px 20px;border:2px solid #f0f0f0;border-radius:15px;font-size:1rem;background:#f8f9fa;transition:all .3s;}
+        .form-control:focus{outline:0;border-color:#667eea;}
+        .mission-type-selector{display:flex;gap:10px;margin-bottom:20px;}
+        .type-option{flex:1;padding:12px;text-align:center;border:2px solid #667eea30;border-radius:12px;cursor:pointer;transition:all .3s;color:#667eea;}
+        .type-option.active{background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;border-color:transparent;}
+        .deadline-input{display:none;margin-bottom:20px;}
+        .deadline-input.show{display:block;}
+        .panel-buttons{display:flex;gap:10px;margin-top:20px;}
+        .submit-btn,.cancel-btn{flex:1;padding:15px;border:none;border-radius:15px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all .3s;}
+        .submit-btn{background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;}
+        .cancel-btn{background:#f0f0f0;color:#666;}
+        .submit-btn:hover,.cancel-btn:hover{transform:scale(1.02);}
+        .sub-missions-grid{display:flex;flex-direction:column;gap:15px;}
+        .sub-mission-card{background:#fff;border-radius:20px;padding:20px;border:1px solid #f0f0f0;transition:all .3s;}
+        .sub-mission-card:hover{transform:translateX(-5px);box-shadow:0 10px 30px rgba(102,126,234,.2);}
+        .card-title{font-size:1.2rem;font-weight:700;margin-bottom:10px;}
+        .deadline-badge{background:#ff6b6b20;color:#ff6b6b;padding:5px 12px;border-radius:30px;font-size:.9rem;display:inline-flex;align-items:center;gap:5px;margin-bottom:10px;}
+        .subtasks-section{background:#f8f9fa;border-radius:12px;padding:15px;margin:15px 0;}
+        .subtasks-title{display:flex;justify-content:space-between;color:#667eea;font-weight:600;margin-bottom:10px;}
+        .subtask-item{display:flex;align-items:center;gap:10px;padding:8px;background:#fff;border-radius:8px;margin:5px 0;}
+        .subtask-checkbox{width:20px;height:20px;cursor:pointer;}
+        .subtask-text{flex:1;font-size:.95rem;}
+        .subtask-text.completed{text-decoration:line-through;opacity:.6;}
+        .subtask-delete{color:#ff6b6b;cursor:pointer;opacity:0;transition:opacity .2s;}
+        .subtask-item:hover .subtask-delete{opacity:1;}
+        .add-subtask-input{display:flex;gap:10px;margin-top:10px;}
+        .add-subtask-input input{flex:1;padding:8px;border:2px solid #f0f0f0;border-radius:8px;}
+        .add-subtask-btn{padding:8px 15px;background:#667eea;color:#fff;border:none;border-radius:8px;cursor:pointer;}
+        .card-meta{display:flex;gap:10px;margin:10px 0;}
+        .meta-tag{background:#f0f0f0;padding:5px 12px;border-radius:30px;font-size:.9rem;display:flex;align-items:center;gap:5px;}
+        .card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:15px;border-top:1px solid #f0f0f0;}
+        .card-actions{display:flex;gap:8px;}
+        .action-btn{width:40px;height:40px;border:none;border-radius:12px;background:#f0f0f0;cursor:pointer;transition:all .2s;}
+        .action-btn:hover{background:#667eea;color:#fff;transform:scale(1.1);}
+        .task-score-badge{background:#48dbfb20;color:#48dbfb;padding:5px 10px;border-radius:20px;}
+        .bottom-buttons{position:fixed;bottom:30px;left:30px;display:flex;flex-direction:column;gap:15px;z-index:100;}
+        .floating-add-btn,.alarm-button{width:60px;height:60px;border-radius:50%;border:none;background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;font-size:2rem;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,.5);transition:all .3s;}
+        .floating-add-btn:hover,.alarm-button:hover{transform:scale(1.1);}
+        .alarm-panel{position:fixed;top:20%;left:50%;transform:translateX(-50%);width:500px;max-width:90%;background:#fff;border-radius:20px;display:none;z-index:2000;border:2px solid #667eea;resize:both;overflow:auto;min-width:300px;min-height:250px;}
+        .alarm-panel.show{display:block;}
+        .alarm-header{background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;padding:15px;border-radius:18px 18px 0 0;display:flex;justify-content:space-between;cursor:move;}
+        .alarm-content{padding:20px;}
+        .timer-display{font-size:3rem;text-align:center;color:#667eea;margin:15px 0;font-family:monospace;}
+        .timer-controls{display:flex;justify-content:center;gap:10px;margin:15px 0;}
+        .timer-btn{width:45px;height:45px;border-radius:50%;border:none;background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;cursor:pointer;transition:all .3s;}
+        .timer-btn:hover{transform:scale(1.1);}
+        .timer-btn.stop{background:#ff6b6b;}
+        .timer-mode-selector{display:flex;justify-content:center;gap:10px;margin:15px 0;}
+        .mode-btn{padding:6px 15px;border:2px solid #667eea;background:transparent;border-radius:30px;color:#667eea;cursor:pointer;transition:all .3s;}
+        .mode-btn.active{background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;}
+        .timer-input{display:flex;justify-content:center;gap:10px;margin-top:15px;flex-wrap:wrap;}
+        .timer-input input{width:70px;padding:8px;border:2px solid #f0f0f0;border-radius:10px;}
+        .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);backdrop-filter:blur(5px);display:none;justify-content:center;align-items:center;z-index:3000;}
+        .modal.show{display:flex;}
+        .modal-content{background:#fff;border-radius:30px;padding:40px;width:90%;max-width:500px;animation:modalPop .3s;}
+        @keyframes modalPop{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
+        .modal-header{text-align:center;margin-bottom:30px;}
+        .modal-header i{font-size:3rem;color:#667eea;}
+        .modal-input,.modal-select{width:100%;padding:15px;border:2px solid #f0f0f0;border-radius:15px;margin-bottom:15px;}
+        .avatar-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0;}
+        .avatar-option{aspect-ratio:1;border-radius:50%;background:rgba(102,126,234,.1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#667eea;cursor:pointer;border:2px solid transparent;transition:all .3s;}
+        .avatar-option:hover{transform:scale(1.1);background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;}
+        .avatar-option.selected{border-color:#667eea;background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;}
+        .modal-buttons{display:flex;gap:10px;}
+        .modal-btn{flex:1;padding:15px;border:none;border-radius:15px;font-size:1.1rem;cursor:pointer;transition:all .3s;}
+        .modal-btn:hover{transform:scale(1.02);}
+        .modal-btn.primary{background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;}
+        .modal-btn.secondary{background:#f0f0f0;color:#666;}
+        .notifications-panel{position:fixed;top:90px;right:20px;width:350px;background:#fff;border-radius:20px;display:none;z-index:2000;box-shadow:0 10px 40px rgba(0,0,0,.2);}
+        .notifications-panel.show{display:block;}
+        .notifications-header{background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;padding:15px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;}
+        .notifications-list{max-height:300px;overflow-y:auto;padding:10px;}
+        .notification-item{padding:10px;border-bottom:1px solid #f0f0f0;}
+        .notification-item:hover{background:#f8f9fa;}
+        .notification-text{display:flex;align-items:center;gap:10px;}
+        .notification-text i{color:#48dbfb;}
+        .notification-time{font-size:.8rem;color:#888;margin-top:5px;}
+        .profile-page{padding:20px;max-width:600px;margin:0 auto;}
+        .profile-card{background:#fff;border-radius:30px;padding:30px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.1);}
+        .profile-avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(145deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:3rem;color:#fff;border:4px solid #fff;box-shadow:0 10px 30px rgba(102,126,234,.3);}
+        .profile-name{font-size:2rem;font-weight:700;margin-bottom:10px;color:#333;}
+        .profile-bio{color:#666;margin-bottom:30px;}
+        .profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:30px 0;padding:20px 0;border-top:2px solid #f0f0f0;border-bottom:2px solid #f0f0f0;}
+        .stat-value{font-size:1.8rem;font-weight:700;color:#667eea;}
+        .stat-label{font-size:.9rem;color:#888;}
+        .profile-info{text-align:right;margin:20px 0;}
+        .info-row{display:flex;align-items:center;gap:15px;padding:12px;background:#f8f9fa;border-radius:12px;margin:8px 0;}
+        .info-row i{width:25px;color:#667eea;font-size:1.2rem;}
+        .profile-actions{display:flex;gap:10px;margin-top:30px;}
+        .profile-btn{flex:1;padding:12px;border:none;border-radius:12px;font-weight:600;cursor:pointer;transition:all .3s;}
+        .profile-btn:hover{transform:scale(1.02);}
+        .edit-btn{background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;}
+        .logout-btn{background:#f0f0f0;color:#666;}
+        .settings-page{padding:20px;max-width:800px;margin:0 auto;}
+        .settings-group{background:#fff;border-radius:20px;padding:25px;box-shadow:0 5px 20px rgba(0,0,0,.05);}
+        .settings-group h2{color:#667eea;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+        .code-section{display:flex;flex-direction:column;align-items:center;gap:30px;padding:20px;}
+        .code-button{padding:20px 40px;font-size:1.8rem;background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;border:none;border-radius:60px;cursor:pointer;transition:all .3s;box-shadow:0 10px 30px rgba(102,126,234,.4);width:fit-content;margin:0 auto;}
+        .code-button:hover{transform:scale(1.05);}
+        .code-input-container{display:flex;flex-direction:column;align-items:center;gap:15px;width:100%;}
+        .code-input{width:150px;height:150px;font-size:3rem;text-align:center;border:4px solid #667eea;border-radius:20px;margin:0 auto;}
+        .code-input:focus{outline:0;border-color:#764ba2;}
+        .secret-message{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,#667eea,#764ba2);color:#fff;padding:30px 50px;border-radius:60px;font-size:1.8rem;z-index:3000;display:flex;align-items:center;gap:20px;border:3px solid #fff;animation:messagePop .5s;}
+        @keyframes messagePop{from{opacity:0;transform:translate(-50%,-30%);}to{opacity:1;transform:translate(-50%,-50%);}}
+        .completed-missions-page{padding:20px;}
+        .completed-card{background:#fff;border-radius:15px;padding:15px;margin-bottom:10px;display:flex;align-items:center;gap:15px;opacity:.8;}
+        .completed-card i{color:#48dbfb;}
+        .completed-card .task-title{flex:1;text-decoration:line-through;}
+        .progress-indicator{position:fixed;bottom:30px;right:30px;background:#fff;border-radius:50px;padding:10px 20px;display:flex;align-items:center;gap:10px;box-shadow:0 5px 20px rgba(0,0,0,.1);z-index:100;}
+        .progress-circle{width:40px;height:40px;border-radius:50%;background:linear-gradient(145deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;}
+        .success-message{position:fixed;top:20px;right:50%;transform:translateX(50%);background:#48dbfb;color:#fff;padding:15px 30px;border-radius:50px;z-index:3000;animation:slideDown .3s;}
+        @keyframes slideDown{from{top:-100px;}to{top:20px;}}
+        .welcome-message{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:50;pointer-events:none;width:100%;}
+        .welcome-title{font-size:3rem;font-weight:800;background:linear-gradient(145deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    </style>
+</head>
+<body>
+    <!-- Alarm Panel -->
+    <div class="alarm-panel" id="alarmPanel">
+        <div class="alarm-header" id="alarmHeader">
+            <h3><i class="fas fa-clock"></i> المنبه</h3>
+            <button class="close-alarm" onclick="closeAlarm()" style="background:none;border:none;color:#fff;font-size:1.5rem;">✕</button>
+        </div>
+        <div class="alarm-content">
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="timer-mode-selector">
+                <button class="mode-btn active" onclick="setTimerMode('countdown',this)">عد تنازلي</button>
+                <button class="mode-btn" onclick="setTimerMode('countup',this)">عد تصاعدي</button>
+            </div>
+            <div class="timer-controls">
+                <button class="timer-btn" onclick="startTimer()"><i class="fas fa-play"></i></button>
+                <button class="timer-btn stop" onclick="pauseTimer()"><i class="fas fa-pause"></i></button>
+                <button class="timer-btn" onclick="resetTimer()"><i class="fas fa-redo-alt"></i></button>
+            </div>
+            <div class="timer-input">
+                <input type="number" id="timerMinutes" value="25" min="1" max="180">
+                <span>دقيقة</span>
+                <button onclick="setCustomTime()">ضبط</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-user-astronaut"></i>
+                <h2>مرحباً بك في Mission Master</h2>
+            </div>
+            <input type="text" id="userName" class="modal-input" placeholder="الاسم" autocomplete="off">
+            <select id="userGrade" class="modal-select">
+                <option value="">اختر السنة الدراسية</option>
+                <option value="1 اعدادي">1 إعدادي</option>
+                <option value="2 اعدادي">2 إعدادي</option>
+                <option value="3 اعدادي">3 إعدادي</option>
+                <option value="1 ثانوي">1 ثانوي</option>
+                <option value="2 ثانوي">2 ثانوي</option>
+                <option value="3 ثانوي">3 ثانوي</option>
+                <option value="جامعة">جامعة</option>
+                <option value="خريج">خريج</option>
+            </select>
+            <input type="number" id="userAge" class="modal-input" placeholder="العمر" min="10" max="100">
+            <div>
+                <label style="color:#667eea; font-weight:600;">اختر صورتك الرمزية:</label>
+                <div class="avatar-selector" id="avatarSelector">
+                    <div class="avatar-option selected" data-avatar="🧑"><i class="fas fa-user"></i></div>
+                    <div class="avatar-option" data-avatar="👨‍🎓"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="avatar-option" data-avatar="👩‍🔬"><i class="fas fa-flask"></i></div>
+                    <div class="avatar-option" data-avatar="👨‍💻"><i class="fas fa-laptop-code"></i></div>
+                    <div class="avatar-option" data-avatar="👩‍🏫"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="avatar-option" data-avatar="👨‍🔧"><i class="fas fa-tools"></i></div>
+                    <div class="avatar-option" data-avatar="👩‍🎨"><i class="fas fa-paint-brush"></i></div>
+                    <div class="avatar-option" data-avatar="👨‍🚒"><i class="fas fa-fire-extinguisher"></i></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="saveUserProfile()">تسجيل الدخول</button>
+                <button class="modal-btn secondary" onclick="closeAuthModal()">دخول كزائر</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-user-edit"></i>
+                <h2>تعديل الملف الشخصي</h2>
+            </div>
+            <input type="text" id="editName" class="modal-input" placeholder="الاسم" value="زائر">
+            <select id="editGrade" class="modal-select">
+                <option value="">اختر السنة الدراسية</option>
+                <option value="1 اعدادي">1 إعدادي</option>
+                <option value="2 اعدادي">2 إعدادي</option>
+                <option value="3 اعدادي">3 إعدادي</option>
+                <option value="1 ثانوي">1 ثانوي</option>
+                <option value="2 ثانوي">2 ثانوي</option>
+                <option value="3 ثانوي">3 ثانوي</option>
+                <option value="جامعة">جامعة</option>
+                <option value="خريج">خريج</option>
+            </select>
+            <input type="number" id="editAge" class="modal-input" placeholder="العمر" min="10" max="100">
+            <div>
+                <label style="color:#667eea; font-weight:600;">اختر صورتك الرمزية:</label>
+                <div class="avatar-selector" id="editAvatarSelector">
+                    <div class="avatar-option selected" data-avatar="🧑"><i class="fas fa-user"></i></div>
+                    <div class="avatar-option" data-avatar="👨‍🎓"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="avatar-option" data-avatar="👩‍🔬"><i class="fas fa-flask"></i></div>
+                    <div class="avatar-option" data-avatar="👨‍💻"><i class="fas fa-laptop-code"></i></div>
+                    <div class="avatar-option" data-avatar="👩‍🏫"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="avatar-option" data-avatar="👨‍🔧"><i class="fas fa-tools"></i></div>
+                    <div class="avatar-option" data-avatar="👩‍🎨"><i class="fas fa-paint-brush"></i></div>
+                    <div class="avatar-option" data-avatar="👨‍🚒"><i class="fas fa-fire-extinguisher"></i></div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" onclick="saveProfileChanges()">حفظ التغييرات</button>
+                <button class="modal-btn secondary" onclick="closeEditProfileModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Panel -->
+    <div class="notifications-panel" id="notificationsPanel">
+        <div class="notifications-header">
+            <span>الإشعارات</span>
+            <i class="fas fa-bell"></i>
+        </div>
+        <div class="notifications-list" id="notificationsList"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="top-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+            <button class="top-btn" id="notificationsButton" onclick="toggleNotifications()"><i class="fas fa-bell"></i></button>
+            <button class="top-btn" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <!-- Navigation Bar -->
+        <div class="nav-bar" id="navBar">
+            <div class="nav-header" onclick="showProfilePage()">
+                <div class="logo"><i class="fas fa-rocket"></i><span>Mission Master</span></div>
+                <div class="user-avatar" id="userAvatar"><i class="fas fa-user"></i></div>
+            </div>
+            <div class="user-name-small" id="userNameDisplay">زائر</div>
+
+            <!-- Daily Category -->
+            <div class="mission-category">
+                <div class="category-header" onclick="toggleCategory('daily')">
+                    <span><i class="fas fa-sun"></i> اليومية</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="category-content" id="dailyCategory">
+                    <div class="main-missions-section">
+                        <div class="main-missions-header" onclick="toggleMainMissions('daily')">
+                            <span><i class="fas fa-folder"></i> مهام رئيسية</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="main-missions-content" id="dailyMainMissions"></div>
+                    </div>
+                    <div class="category-add-btn" onclick="showAddMainMissionForm('daily')">
+                        <i class="fas fa-plus"></i> إضافة مهمة رئيسية
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weekly Category -->
+            <div class="mission-category">
+                <div class="category-header" onclick="toggleCategory('weekly')">
+                    <span><i class="fas fa-calendar-week"></i> الأسبوعية</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="category-content" id="weeklyCategory">
+                    <div class="main-missions-section">
+                        <div class="main-missions-header" onclick="toggleMainMissions('weekly')">
+                            <span><i class="fas fa-folder"></i> مهام رئيسية</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="main-missions-content" id="weeklyMainMissions"></div>
+                    </div>
+                    <div class="category-add-btn" onclick="showAddMainMissionForm('weekly')">
+                        <i class="fas fa-plus"></i> إضافة مهمة رئيسية
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Category -->
+            <div class="mission-category">
+                <div class="category-header" onclick="toggleCategory('monthly')">
+                    <span><i class="fas fa-calendar-alt"></i> الشهرية</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="category-content" id="monthlyCategory">
+                    <div class="main-missions-section">
+                        <div class="main-missions-header" onclick="toggleMainMissions('monthly')">
+                            <span><i class="fas fa-folder"></i> مهام رئيسية</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="main-missions-content" id="monthlyMainMissions"></div>
+                    </div>
+                    <div class="category-add-btn" onclick="showAddMainMissionForm('monthly')">
+                        <i class="fas fa-plus"></i> إضافة مهمة رئيسية
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Missions Button -->
+            <div class="show-completed-btn" onclick="showCompletedMissionsPage()">
+                <i class="fas fa-check-circle"></i> المهام المكتملة
+            </div>
+
+            <!-- Settings Button -->
+            <div class="settings-section">
+                <div class="settings-item" onclick="showSettingsPage()">
+                    <i class="fas fa-cog"></i> الإعدادات
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content" id="mainContent">
+            <!-- Welcome Message (shown only on home page when no mission selected) -->
+            <div class="welcome-message" id="welcomeMessage">
+                <div class="welcome-title">✨ أنت قادر على النجاح ✨</div>
+            </div>
+
+            <!-- Home Page (Missions) -->
+            <div id="homePage" class="page active">
+                <div class="page-header">
+                    <h1 id="currentMainTitle">وَقُل رَّبِّ زِدْنِي عِلْمًا</h1>
+                </div>
+
+                <!-- Add Main Mission Panel -->
+                <div id="addMainMissionPanel" class="add-mission-panel hidden">
+                    <h3 style="margin-bottom:20px;color:#667eea;">إضافة مهمة رئيسية جديدة</h3>
+                    
+                    <div class="form-group">
+                        <label>عنوان المهمة الرئيسية</label>
+                        <input type="text" id="mainMissionTitle" class="form-control" placeholder="أدخل عنوان المهمة الرئيسية">
+                    </div>
+                    
+                    <!-- حقل التاريخ والوقت للمهام الأسبوعية والشهرية -->
+                    <div id="deadlineDateTimeInput" class="deadline-input">
+                        <div class="form-group">
+                            <label id="deadlineLabel">تاريخ ووقت الموعد النهائي</label>
+                            <input type="datetime-local" id="deadlineDateTime" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="panel-buttons">
+                        <button class="submit-btn" onclick="saveMainMission()"><i class="fas fa-save"></i> حفظ</button>
+                        <button class="cancel-btn" onclick="cancelAddMainMission()"><i class="fas fa-times"></i> إلغاء</button>
+                    </div>
+                </div>
+
+                <!-- Add Sub Mission Panel -->
+                <div id="addSubMissionPanel" class="add-mission-panel hidden">
+                    <h3 style="margin-bottom:20px;color:#667eea;" id="subPanelTitle">إضافة مهمة جديدة</h3>
+                    
+                    <div class="form-group">
+                        <label>عنوان المهمة</label>
+                        <input type="text" id="taskTitle" class="form-control" placeholder="أدخل عنوان المهمة">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>المدة المتوقعة</label>
+                        <input type="text" id="taskTime" class="form-control" placeholder="مثال: 2 ساعات">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>نقاط المهمة</label>
+                        <div id="subtasksContainer"></div>
+                        <div class="add-subtask-input">
+                            <input type="text" id="newSubtaskInput" placeholder="أضف نقطة جديدة...">
+                            <button class="add-subtask-btn" onclick="addSubtaskField()">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-buttons">
+                        <button class="submit-btn" id="submitBtn" onclick="saveSubMission()"><i class="fas fa-save"></i> <span id="submitBtnText">حفظ</span></button>
+                        <button class="cancel-btn" onclick="cancelAddMission()"><i class="fas fa-times"></i> إلغاء</button>
+                    </div>
+                </div>
+
+                <!-- Sub Missions Grid -->
+                <div class="sub-missions-grid" id="subMissionsGrid"></div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profilePage" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-user-circle"></i> الملف الشخصي</h1>
+                    <button class="back-btn" onclick="backToHome()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="profile-page">
+                    <div class="profile-card">
+                        <div class="profile-avatar" id="profileAvatar">🧑</div>
+                        <div class="profile-name" id="profileName">زائر</div>
+                        <div class="profile-bio" id="profileBio">عضو في Mission Master</div>
+                        
+                        <div class="profile-stats">
+                            <div>
+                                <div class="stat-value" id="statTasks">0</div>
+                                <div class="stat-label">مهام مكتملة</div>
+                            </div>
+                            <div>
+                                <div class="stat-value" id="statScore">0</div>
+                                <div class="stat-label">🏆 نقاط</div>
+                            </div>
+                            <div>
+                                <div class="stat-value" id="statStreak">0</div>
+                                <div class="stat-label">أيام متتالية</div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-info">
+                            <div class="info-row">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span id="infoGrade">لم يحدد</span>
+                            </div>
+                            <div class="info-row">
+                                <i class="fas fa-birthday-cake"></i>
+                                <span id="infoAge">-- سنة</span>
+                            </div>
+                            <div class="info-row">
+                                <i class="fas fa-calendar-check"></i>
+                                <span id="infoJoined">منذ اليوم</span>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-actions">
+                            <button class="profile-btn edit-btn" onclick="showEditProfileModal()"><i class="fas fa-edit"></i> تعديل الملف</button>
+                            <button class="profile-btn logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settingsPage" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-cog"></i> الإعدادات</h1>
+                    <button class="back-btn" onclick="backToHome()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="settings-page">
+                    <div class="settings-group">
+                        <h2><i class="fas fa-key"></i> الأكواد السرية</h2>
+                        <div class="code-section">
+                            <button class="code-button" onclick="toggleCodeInput()"><i class="fas fa-key"></i> فك الرمز</button>
+                            <div id="codeInputContainer" style="display:none;" class="code-input-container">
+                                <div style="margin-bottom:10px; color:#667eea;">أدخل الرمز المكون من 6 أحرف</div>
+                                <input type="text" id="codeInput" class="code-input" maxlength="6" placeholder="******">
+                                <div style="display:flex; gap:10px; justify-content:center;">
+                                    <button onclick="decodeCode()" class="modal-btn primary">تأكيد</button>
+                                    <button onclick="hideCodeInput()" class="modal-btn secondary">إلغاء</button>
+                                </div>
+                                <div id="codeResult" style="margin-top:20px; width:100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Missions Page -->
+            <div id="completedPage" class="page">
+                <div class="page-header">
+                    <h1><i class="fas fa-check-circle"></i> المهام المكتملة</h1>
+                    <button class="back-btn" onclick="backToHome()"><i class="fas fa-times"></i></button>
+                </div>
+                <div id="completedTasksList" class="completed-missions-page"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Buttons -->
+        <div class="bottom-buttons">
+            <button class="floating-add-btn" onclick="showAddSubMissionForm()"><i class="fas fa-plus"></i></button>
+            <button class="alarm-button" onclick="toggleAlarm()"><i class="fas fa-clock"></i></button>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-indicator">
+            <div class="progress-circle" id="progressCircle">0%</div>
+            <span>تقدم اليوم</span>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div id="successMessage" style="display:none;" class="success-message">
+        <i class="fas fa-check-circle"></i> <span id="messageText">تمت الإضافة بنجاح</span>
+    </div>
+
+    <script>
+        // User Data
+        let userData = {
+            name: 'زائر',
+            grade: '',
+            age: '',
+            avatar: '🧑',
+            joinedDate: new Date().toISOString(),
+            stats: {
+                completedTasks: 0,
+                score: 0,
+                streak: 0
+            }
+        };
+
+        // Missions Data Structure
+        let missions = {
+            daily: {},
+            weekly: {},
+            monthly: {}
+        };
+
+        // Current State
+        let currentCategory = 'daily';
+        let currentMainMission = null;
+        
+        // Timer Variables
+        let timerSeconds = 1500;
+        let timerRunning = false;
+        let timerMode = 'countdown';
+        let timerInterval = null;
+        
+        // Notifications and Completed Tasks
+        let notifications = [];
+        let completedTasks = [];
+        
+        // Subtask Fields
+        let subtaskFields = [];
+        let editingTaskId = null;
+        let editingMissionId = null;
+        let nextTaskId = 1;
+        let nextSubtaskId = 1;
+        
+        // Current mission type for adding (determined by which button was clicked)
+        let currentMissionType = 'daily';
+
+        // Secret Codes
+        const secretCodes = {
+            '#0080#': { message: 'عمك بكر بيمسي عليك يلا ذاكر', icon: 'fa-book' },
+            '#9912#': { message: 'اللهم صل وسلم على سيدنا ومولانا رسول الله', icon: 'fa-mosque' },
+            '#12345#': { message: 'ذاكر يا دوك عين شمس تنتظرك', icon: 'fa-graduation-cap' },
+            '*000#': { message: 'ذاكري عشان العيد ميبقاش فيه كحكين 👀', icon: 'fa-star' }
+        };
+
+        // ============ Sound Functions ============
+        function playNotificationSound() {
+            try {
+                let a = new (window.AudioContext || window.webkitAudioContext)();
+                let o = a.createOscillator();
+                let g = a.createGain();
+                o.type = 'sine';
+                o.frequency.value = 880;
+                g.gain.value = 0.1;
+                o.connect(g);
+                g.connect(a.destination);
+                o.start();
+                o.stop(a.currentTime + 0.2);
+                setTimeout(() => {
+                    let o2 = a.createOscillator();
+                    let g2 = a.createGain();
+                    o2.type = 'sine';
+                    o2.frequency.value = 440;
+                    g2.gain.value = 0.1;
+                    o2.connect(g2);
+                    g2.connect(a.destination);
+                    o2.start();
+                    o2.stop(a.currentTime + 0.2);
+                }, 200);
+            } catch (e) { }
+        }
+
+        function playAlarmSound(duration) {
+            let start = Date.now();
+            let interval = setInterval(() => {
+                playNotificationSound(); // reuse the same sound
+                if (Date.now() - start >= duration) clearInterval(interval);
+            }, 200);
+        }
+
+        // ============ Auth Functions ============
+        function showAuthModal() {
+            document.getElementById('authModal').classList.add('show');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('show');
+        }
+
+        // Avatar Selection
+        document.querySelectorAll('.avatar-option').forEach(o => {
+            o.addEventListener('click', function () {
+                document.querySelectorAll('.avatar-option').forEach(x => x.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        function saveUserProfile() {
+            let n = document.getElementById('userName').value.trim();
+            let g = document.getElementById('userGrade').value;
+            let a = document.getElementById('userAge').value;
+            let av = document.querySelector('.avatar-option.selected').dataset.avatar;
+
+            if (!n) {
+                showMessage('❌ الرجاء إدخال الاسم');
+                return;
+            }
+
+            userData = {
+                name: n,
+                grade: g || 'لم يحدد',
+                age: a || '--',
+                avatar: av,
+                joinedDate: userData.joinedDate,
+                stats: userData.stats
+            };
+
+            updateUI();
+            closeAuthModal();
+            showMessage(`✨ مرحباً ${n}!`);
+        }
+
+        function updateUI() {
+            document.getElementById('userNameDisplay').textContent = userData.name;
+            document.getElementById('userAvatar').innerHTML = userData.avatar;
+            document.getElementById('profileAvatar').textContent = userData.avatar;
+            document.getElementById('profileName').textContent = userData.name;
+            document.getElementById('profileBio').textContent = userData.grade ? `طالب في ${userData.grade}` : 'عضو في Mission Master';
+            document.getElementById('infoGrade').textContent = userData.grade || 'لم يحدد';
+            document.getElementById('infoAge').textContent = userData.age + ' سنة';
+            document.getElementById('infoJoined').textContent = new Date(userData.joinedDate).toLocaleDateString('ar-EG');
+
+            document.getElementById('statTasks').textContent = userData.stats.completedTasks;
+            document.getElementById('statScore').textContent = userData.stats.score;
+            document.getElementById('statStreak').textContent = userData.stats.streak;
+        }
+
+        // ============ Navigation Functions ============
+        function toggleNav() {
+            document.getElementById('navBar').classList.toggle('open');
+        }
+
+        function toggleCategory(c) {
+            let el = document.getElementById(c + 'Category');
+            let h = el.previousElementSibling;
+            el.classList.toggle('open');
+            h.classList.toggle('open');
+        }
+
+        function toggleMainMissions(c) {
+            let el = document.getElementById(c + 'MainMissions');
+            let h = el.previousElementSibling;
+            el.classList.toggle('open');
+            h.classList.toggle('open');
+        }
+
+        function showProfilePage() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('profilePage').classList.add('active');
+            document.getElementById('welcomeMessage').style.display = 'none';
+            toggleNav();
+        }
+
+        function showSettingsPage() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('settingsPage').classList.add('active');
+            document.getElementById('welcomeMessage').style.display = 'none';
+            toggleNav();
+        }
+
+        function showCompletedMissionsPage() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('completedPage').classList.add('active');
+            document.getElementById('welcomeMessage').style.display = 'none';
+            renderCompletedTasks();
+            toggleNav();
+        }
+
+        function backToHome() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('homePage').classList.add('active');
+            if (!currentMainMission) {
+                document.getElementById('welcomeMessage').style.display = 'block';
+            }
+        }
+
+        // ============ Profile Edit Functions ============
+        function showEditProfileModal() {
+            document.getElementById('editName').value = userData.name;
+            document.getElementById('editGrade').value = userData.grade || '';
+            document.getElementById('editAge').value = userData.age || '';
+            
+            document.querySelectorAll('#editAvatarSelector .avatar-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.avatar === userData.avatar) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('editProfileModal').classList.add('show');
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').classList.remove('show');
+        }
+
+        function saveProfileChanges() {
+            let n = document.getElementById('editName').value.trim();
+            let g = document.getElementById('editGrade').value;
+            let a = document.getElementById('editAge').value;
+            let av = document.querySelector('#editAvatarSelector .avatar-option.selected').dataset.avatar;
+
+            if (!n) {
+                showMessage('❌ الرجاء إدخال الاسم');
+                return;
+            }
+
+            userData = {
+                ...userData,
+                name: n,
+                grade: g || 'لم يحدد',
+                age: a || '--',
+                avatar: av
+            };
+
+            updateUI();
+            closeEditProfileModal();
+            showMessage('✅ تم تحديث الملف الشخصي');
+        }
+
+        function logout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                userData = {
+                    name: 'زائر',
+                    grade: '',
+                    age: '',
+                    avatar: '🧑',
+                    joinedDate: new Date().toISOString(),
+                    stats: userData.stats
+                };
+                updateUI();
+                backToHome();
+                showMessage('👋 تم تسجيل الخروج');
+            }
+        }
+
+        // ============ Add Main Mission ============
+        function showAddMainMissionForm(category) {
+            currentMissionType = category;
+            document.getElementById('mainMissionTitle').value = '';
+            
+            // Show/hide datetime field based on category
+            let datetimeDiv = document.getElementById('deadlineDateTimeInput');
+            if (category === 'daily') {
+                datetimeDiv.classList.remove('show');
+            } else {
+                datetimeDiv.classList.add('show');
+                let label = category === 'weekly' ? 'موعد المهمة الأسبوعية' : 'موعد المهمة الشهرية';
+                document.getElementById('deadlineLabel').textContent = label;
+                // Set default datetime to now + 1 day for weekly, + 7 days for monthly (optional)
+                let now = new Date();
+                if (category === 'weekly') now.setDate(now.getDate() + 7);
+                else if (category === 'monthly') now.setDate(now.getDate() + 30);
+                let year = now.getFullYear();
+                let month = String(now.getMonth() + 1).padStart(2, '0');
+                let day = String(now.getDate()).padStart(2, '0');
+                let hours = String(now.getHours()).padStart(2, '0');
+                let minutes = String(now.getMinutes()).padStart(2, '0');
+                document.getElementById('deadlineDateTime').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+            
+            document.getElementById('addMainMissionPanel').classList.remove('hidden');
+        }
+
+        function cancelAddMainMission() {
+            document.getElementById('addMainMissionPanel').classList.add('hidden');
+        }
+
+        function saveMainMission() {
+            let title = document.getElementById('mainMissionTitle').value.trim();
+            if (!title) {
+                showMessage('❌ الرجاء إدخال عنوان المهمة');
+                return;
+            }
+
+            let missionId = 'm' + Date.now();
+            let deadline = null;
+            
+            if (currentMissionType !== 'daily') {
+                let datetimeStr = document.getElementById('deadlineDateTime').value;
+                if (!datetimeStr) {
+                    showMessage('❌ الرجاء تحديد تاريخ ووقت الموعد');
+                    return;
+                }
+                let deadlineDate = new Date(datetimeStr);
+                deadline = {
+                    datetime: deadlineDate.toISOString(),
+                    message: `موعد المهمة "${title}" في ${deadlineDate.toLocaleString('ar-EG')}`
+                };
+                
+                // Schedule notification at that time (simplified: check every minute, in real app use setTimeout)
+                let now = new Date();
+                let timeDiff = deadlineDate.getTime() - now.getTime();
+                if (timeDiff > 0) {
+                    setTimeout(() => {
+                        addNotification(`⏰ ${deadline.message}`);
+                        playAlarmSound(3000);
+                    }, timeDiff);
+                }
+            }
+
+            if (!missions[currentMissionType]) missions[currentMissionType] = {};
+            
+            missions[currentMissionType][missionId] = {
+                id: missionId,
+                title: title,
+                type: currentMissionType,
+                deadline: deadline,
+                tasks: [],
+                createdAt: new Date().toISOString()
+            };
+
+            renderMainMissions(currentMissionType);
+            document.getElementById('addMainMissionPanel').classList.add('hidden');
+            showMessage('✅ تمت إضافة المهمة الرئيسية بنجاح');
+            
+            if (!currentMainMission) {
+                currentMainMission = missionId;
+                currentCategory = currentMissionType;
+                document.getElementById('currentMainTitle').textContent = title;
+                document.getElementById('welcomeMessage').style.display = 'none';
+                renderSubMissions(missionId, currentMissionType);
+            }
+        }
+
+        // ============ Add Sub Mission ============
+        function showAddSubMissionForm() {
+            if (!currentMainMission) {
+                showMessage('❌ الرجاء اختيار مهمة رئيسية أولاً');
+                return;
+            }
+
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskTime').value = '';
+            subtaskFields = [];
+            document.getElementById('subtasksContainer').innerHTML = '';
+            editingTaskId = null;
+            document.getElementById('subPanelTitle').textContent = 'إضافة مهمة جديدة';
+            document.getElementById('submitBtnText').textContent = 'حفظ';
+            document.getElementById('addSubMissionPanel').classList.remove('hidden');
+        }
+
+        function cancelAddMission() {
+            document.getElementById('addSubMissionPanel').classList.add('hidden');
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskTime').value = '';
+            subtaskFields = [];
+            document.getElementById('subtasksContainer').innerHTML = '';
+            editingTaskId = null;
+        }
+
+        // ============ Subtasks Management ============
+        function addSubtaskField(value = '') {
+            let c = document.getElementById('subtasksContainer');
+            let i = subtaskFields.length;
+            subtaskFields.push(value);
+            let h = `<div class="subtask-item" id="subtask-${i}">
+                <input type="checkbox" class="subtask-checkbox" disabled>
+                <input type="text" class="form-control" value="${value}" placeholder="نقطة ${i + 1}" style="flex:1;" onchange="updateSubtaskValue(${i},this.value)">
+                <i class="fas fa-trash subtask-delete" onclick="removeSubtaskField(${i})"></i>
+            </div>`;
+            c.insertAdjacentHTML('beforeend', h);
+        }
+
+        function updateSubtaskValue(i, v) {
+            subtaskFields[i] = v;
+        }
+
+        function removeSubtaskField(i) {
+            subtaskFields.splice(i, 1);
+            renderSubtaskFields();
+        }
+
+        function renderSubtaskFields() {
+            let c = document.getElementById('subtasksContainer');
+            c.innerHTML = '';
+            subtaskFields.forEach((v, i) => {
+                c.innerHTML += `<div class="subtask-item" id="subtask-${i}">
+                    <input type="checkbox" class="subtask-checkbox" disabled>
+                    <input type="text" class="form-control" value="${v}" placeholder="نقطة ${i + 1}" style="flex:1;" onchange="updateSubtaskValue(${i},this.value)">
+                    <i class="fas fa-trash subtask-delete" onclick="removeSubtaskField(${i})"></i>
+                </div>`;
+            });
+        }
+
+        function calculateTaskScore(s) {
+            let c = s.length;
+            if (c < 3) return 20;
+            if (c <= 5) return 30;
+            return 35 + ((c - 5) * 5);
+        }
+
+        function saveSubMission() {
+            if (!currentMainMission && !editingMissionId) {
+                showMessage('❌ الرجاء اختيار مهمة رئيسية أولاً');
+                return;
+            }
+
+            let t = document.getElementById('taskTitle').value.trim();
+            let tm = document.getElementById('taskTime').value.trim();
+
+            if (!t) {
+                showMessage('❌ الرجاء إدخال عنوان المهمة');
+                return;
+            }
+
+            let subs = subtaskFields.filter(v => v.trim() !== '').map((v, i) => ({
+                id: i + 1,
+                text: v,
+                completed: false
+            }));
+
+            let sc = calculateTaskScore(subs);
+
+            if (editingTaskId) {
+                let mid = editingMissionId || currentMainMission;
+                let task = missions[currentCategory][mid].tasks.find(x => x.id === editingTaskId);
+                if (task) {
+                    task.title = t;
+                    task.time = tm || "1 ساعة";
+                    task.subtasks = subs;
+                    task.score = sc;
+                }
+                showMessage("✅ تم تحديث المهمة");
+            } else {
+                missions[currentCategory][currentMainMission].tasks.push({
+                    id: nextTaskId++,
+                    title: t,
+                    time: tm || "1 ساعة",
+                    completed: false,
+                    subtasks: subs,
+                    score: sc
+                });
+                showMessage("✅ تمت إضافة المهمة");
+            }
+
+            document.getElementById('addSubMissionPanel').classList.add('hidden');
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskTime').value = '';
+            subtaskFields = [];
+            document.getElementById('subtasksContainer').innerHTML = '';
+            editingTaskId = null;
+
+            renderMainMissions(currentCategory);
+            renderSubMissions(currentMainMission, currentCategory);
+            updateProgress();
+        }
+
+        // ============ Render Missions ============
+        function renderMainMissions(c) {
+            let con = document.getElementById(c + 'MainMissions');
+            if (!con) return;
+            con.innerHTML = '';
+
+            if (!missions[c] || Object.keys(missions[c]).length === 0) {
+                con.innerHTML = '<div style="text-align:center; padding:15px; color:#888;">لا توجد مهام رئيسية</div>';
+                return;
+            }
+
+            Object.values(missions[c]).forEach(m => {
+                let tc = m.tasks.length;
+                let cc = m.tasks.filter(t => t.completed).length;
+                let deadlineHtml = m.deadline ? `<span class="deadline-badge"><i class="fas fa-clock"></i> ${new Date(m.deadline.datetime).toLocaleDateString('ar-EG')}</span>` : '';
+
+                con.innerHTML += `<div class="main-mission-item">
+                    <span class="main-mission-title" onclick="selectMainMission('${m.id}','${c}')">${m.title}</span>
+                    ${deadlineHtml}
+                    <span class="main-mission-count">${cc}/${tc}</span>
+                    <i class="fas fa-check-circle complete-main-mission" onclick="completeMainMission('${m.id}','${c}',event)"></i>
+                    <i class="fas fa-trash delete-main-mission" onclick="deleteMainMission('${m.id}','${c}',event)"></i>
+                </div>`;
+            });
+        }
+
+        function selectMainMission(id, c) {
+            currentMainMission = id;
+            currentCategory = c;
+            document.getElementById('currentMainTitle').textContent = missions[c][id].title;
+            document.getElementById('welcomeMessage').style.display = 'none';
+            renderSubMissions(id, c);
+            backToHome();
+        }
+
+        function renderSubMissions(id, c) {
+            let g = document.getElementById('subMissionsGrid');
+            let m = missions[c][id];
+
+            if (!m || !m.tasks || m.tasks.length === 0) {
+                g.innerHTML = '<div style="text-align:center; padding:50px;"><i class="fas fa-inbox" style="font-size:4rem; color:#888;"></i><h3>لا توجد مهام</h3><p>اضغط على زر + للإضافة</p></div>';
+                return;
+            }
+
+            let at = m.tasks.filter(t => !t.completed);
+            if (at.length === 0) {
+                g.innerHTML = '<div style="text-align:center; padding:50px;"><i class="fas fa-check-circle" style="font-size:4rem; color:#48dbfb;"></i><h3>تهانينا! 🎉</h3><p>كل المهام مكتملة</p></div>';
+                return;
+            }
+
+            g.innerHTML = at.map(t => {
+                let subs = t.subtasks || [];
+                let cs = subs.filter(s => s.completed).length;
+                let ts = subs.length;
+                let deadlineMsg = m.deadline ? `<div class="deadline-badge"><i class="fas fa-clock"></i> الموعد: ${new Date(m.deadline.datetime).toLocaleString('ar-EG')}</div>` : '';
+
+                return `<div class="sub-mission-card">
+                    <div class="card-title">${t.title}</div>
+                    ${deadlineMsg}
+                    ${subs.length ? `<div class="subtasks-section">
+                        <div class="subtasks-title">
+                            <span>النقاط (${cs}/${ts})</span>
+                            <span class="task-score-badge">🏆 ${t.score}</span>
+                        </div>
+                        ${subs.map((s, i) => `<div class="subtask-item">
+                            <input type="checkbox" class="subtask-checkbox" ${s.completed ? 'checked' : ''} onchange="toggleSubtask('${id}','${c}',${t.id},${i})">
+                            <span class="subtask-text ${s.completed ? 'completed' : ''}">${s.text}</span>
+                            <i class="fas fa-trash subtask-delete" onclick="deleteSubtask('${id}','${c}',${t.id},${i})"></i>
+                        </div>`).join('')}
+                    </div>` : ''}
+                    <div class="card-meta">
+                        <span class="meta-tag"><i class="fas fa-clock"></i> ${t.time}</span>
+                        <span class="meta-tag"><i class="fas fa-list"></i> ${subs.length} نقاط</span>
+                    </div>
+                    <div class="card-footer">
+                        <div class="task-score-badge">🏆 ${t.score}</div>
+                        <div class="card-actions">
+                            <button class="action-btn" onclick="toggleTaskStatus('${id}','${c}',${t.id})"><i class="fas fa-check"></i></button>
+                            <button class="action-btn" onclick="showEditSubMissionForm(${t.id})"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn" onclick="deleteSubMission('${id}','${c}',${t.id},event)"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ============ Task Completion ============
+        function toggleTaskStatus(id, c, tid) {
+            let t = missions[c][id].tasks.find(x => x.id === tid);
+            if (t && !t.completed) {
+                t.completed = true;
+                completedTasks.push({ ...t, missionTitle: missions[c][id].title });
+                if (t.subtasks) t.subtasks.forEach(s => s.completed = true);
+                userData.stats.completedTasks++;
+                userData.stats.score += t.score;
+                addNotification(`✅ أتممت المهمة: ${t.title}`);
+                playNotificationSound();
+                updateUI();
+                renderMainMissions(c);
+                renderSubMissions(id, c);
+                updateProgress();
+            }
+        }
+
+        function toggleSubtask(id, c, tid, i) {
+            let t = missions[c][id].tasks.find(x => x.id === tid);
+            if (t && t.subtasks) {
+                t.subtasks[i].completed = !t.subtasks[i].completed;
+                addNotification(`✅ أتممت نقطة: ${t.subtasks[i].text}`);
+                playNotificationSound();
+
+                if (t.subtasks.every(s => s.completed) && !t.completed) {
+                    t.completed = true;
+                    userData.stats.completedTasks++;
+                    userData.stats.score += t.score;
+                    completedTasks.push({ ...t, missionTitle: missions[c][id].title });
+                    updateUI();
+                    renderMainMissions(c);
+                }
+                renderSubMissions(id, c);
+                updateProgress();
+            }
+        }
+
+        function deleteSubtask(id, c, tid, i) {
+            let t = missions[c][id].tasks.find(x => x.id === tid);
+            if (t && t.subtasks) {
+                t.subtasks.splice(i, 1);
+                t.score = calculateTaskScore(t.subtasks);
+                renderSubMissions(id, c);
+            }
+        }
+
+        function showEditSubMissionForm(tid) {
+            for (let mid in missions[currentCategory]) {
+                let t = missions[currentCategory][mid].tasks.find(x => x.id === tid);
+                if (t) {
+                    document.getElementById('taskTitle').value = t.title || '';
+                    document.getElementById('taskTime').value = t.time || '';
+                    subtaskFields = t.subtasks ? t.subtasks.map(s => s.text) : [];
+                    renderSubtaskFields();
+                    editingTaskId = t.id;
+                    editingMissionId = mid;
+                    document.getElementById('subPanelTitle').textContent = 'تعديل المهمة';
+                    document.getElementById('submitBtnText').textContent = 'تحديث';
+                    document.getElementById('addSubMissionPanel').classList.remove('hidden');
+                    break;
+                }
+            }
+        }
+
+        function deleteSubMission(id, c, tid, e) {
+            e.stopPropagation();
+            if (confirm("هل أنت متأكد من حذف هذه المهمة؟")) {
+                missions[c][id].tasks = missions[c][id].tasks.filter(t => t.id !== tid);
+                renderMainMissions(c);
+                renderSubMissions(id, c);
+                updateProgress();
+                showMessage('✅ تم الحذف');
+            }
+        }
+
+        function completeMainMission(id, c, e) {
+            e.stopPropagation();
+            let m = missions[c][id];
+            if (!m) return;
+
+            let cnt = 0;
+            let scr = 0;
+
+            m.tasks.forEach(t => {
+                if (!t.completed) {
+                    t.completed = true;
+                    cnt++;
+                    scr += t.score || 20;
+                    if (t.subtasks) t.subtasks.forEach(s => s.completed = true);
+                    completedTasks.push({ ...t, missionTitle: m.title });
+                }
+            });
+
+            if (cnt > 0) {
+                userData.stats.completedTasks += cnt;
+                userData.stats.score += scr;
+                addNotification(`🎉 تم إكمال "${m.title}" بالكامل! +${scr} نقطة`);
+                playAlarmSound(1000);
+                updateUI();
+                renderMainMissions(c);
+                if (currentMainMission === id) renderSubMissions(id, c);
+                updateProgress();
+            } else {
+                showMessage("✨ كل المهام مكتملة بالفعل!");
+            }
+        }
+
+        function deleteMainMission(id, c, e) {
+            e.stopPropagation();
+            if (confirm("هل أنت متأكد من حذف هذه المهمة الرئيسية وجميع مهامها الفرعية؟")) {
+                delete missions[c][id];
+
+                if (currentMainMission === id) {
+                    let f = Object.keys(missions[c])[0];
+                    if (f) {
+                        selectMainMission(f, c);
+                    } else {
+                        currentMainMission = null;
+                        document.getElementById('currentMainTitle').textContent = 'وَقُل رَّبِّ زِدْنِي عِلْمًا';
+                        document.getElementById('welcomeMessage').style.display = 'block';
+                    }
+                }
+
+                renderMainMissions(c);
+                showMessage('✅ تم الحذف');
+            }
+        }
+
+        // ============ Notifications ============
+        function addNotification(t) {
+            let n = {
+                id: Date.now(),
+                text: t,
+                time: new Date().toLocaleTimeString('ar-EG'),
+                date: new Date().toDateString()
+            };
+            notifications.unshift(n);
+            notifications = notifications.filter(n => n.date === new Date().toDateString());
+            document.getElementById('notificationsButton').classList.toggle('has-notifications', notifications.length > 0);
+            renderNotifications();
+        }
+
+        function renderNotifications() {
+            let l = document.getElementById('notificationsList');
+            if (notifications.length === 0) {
+                l.innerHTML = '<div style="text-align:center; padding:20px;">لا توجد إشعارات جديدة</div>';
+            } else {
+                l.innerHTML = notifications.map(n => `<div class="notification-item">
+                    <div class="notification-text"><i class="fas fa-check-circle"></i> ${n.text}</div>
+                    <div class="notification-time">${n.time}</div>
+                </div>`).join('');
+            }
+        }
+
+        function toggleNotifications() {
+            let p = document.getElementById('notificationsPanel');
+            p.classList.toggle('show');
+            if (p.classList.contains('show')) renderNotifications();
+        }
+
+        // ============ Completed Tasks ============
+        function renderCompletedTasks() {
+            let list = document.getElementById('completedTasksList');
+            if (completedTasks.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:50px;">لا توجد مهام مكتملة بعد</div>';
+            } else {
+                list.innerHTML = completedTasks.map(t => `<div class="completed-card">
+                    <i class="fas fa-check-circle"></i>
+                    <span class="task-title">${t.title}</span>
+                    <span style="color:#667eea;">${t.missionTitle}</span>
+                    <span style="color:#48dbfb;">🏆 ${t.score || 0}</span>
+                </div>`).join('');
+            }
+        }
+
+        // ============ Alarm Functions ============
+        function toggleAlarm() {
+            document.getElementById('alarmPanel').classList.toggle('show');
+        }
+
+        function closeAlarm() {
+            document.getElementById('alarmPanel').classList.remove('show');
+        }
+
+        function setTimerMode(m, el) {
+            timerMode = m;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            resetTimer();
+        }
+
+        function startTimer() {
+            if (timerRunning) return;
+            timerRunning = true;
+
+            timerInterval = setInterval(() => {
+                if (timerMode === 'countdown') {
+                    if (timerSeconds > 0) {
+                        timerSeconds--;
+                    } else {
+                        pauseTimer();
+                        playAlarmSound(3000);
+                        let msg = (userData.name !== 'زائر' ? userData.name + '، ' : '') + '⏰ انتهى الوقت!';
+                        showMessage(msg);
+                        addNotification(msg);
+                    }
+                } else {
+                    timerSeconds++;
+                }
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = timerMode === 'countdown' ? 1500 : 0;
+            updateTimerDisplay();
+        }
+
+        function setCustomTime() {
+            let minutes = parseInt(document.getElementById('timerMinutes').value) || 25;
+            timerSeconds = minutes * 60;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            let m = Math.floor(timerSeconds / 60);
+            let s = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        // ============ Settings Functions ============
+        function toggleCodeInput() {
+            let c = document.getElementById('codeInputContainer');
+            c.style.display = c.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function hideCodeInput() {
+            document.getElementById('codeInputContainer').style.display = 'none';
+            document.getElementById('codeResult').style.display = 'none';
+        }
+
+        function decodeCode() {
+            let code = document.getElementById('codeInput').value.trim();
+            let r = document.getElementById('codeResult');
+
+            if (secretCodes[code]) {
+                r.innerHTML = `<div style="background:linear-gradient(145deg,#667eea,#764ba2); color:#fff; padding:20px; border-radius:12px; text-align:center;">
+                    <i class="fas ${secretCodes[code].icon}" style="font-size:2rem; margin-bottom:10px;"></i>
+                    <div>${secretCodes[code].message}</div>
+                </div>`;
+                r.style.display = 'block';
+                document.getElementById('codeInput').value = '';
+                playNotificationSound();
+            } else {
+                r.innerHTML = `<div style="background:#ff6b6b; color:#fff; padding:20px; border-radius:12px; text-align:center;">
+                    <i class="fas fa-times-circle" style="font-size:2rem; margin-bottom:10px;"></i>
+                    <div>⚠️ رمز غير صحيح</div>
+                </div>`;
+                r.style.display = 'block';
+            }
+        }
+
+        // ============ Dark Mode ============
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            let d = document.body.classList.contains('dark-mode');
+            document.querySelector('.top-btn i').className = d ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('darkMode', d);
+        }
+
+        // ============ Progress ============
+        function updateProgress() {
+            let t = 0, c = 0;
+            for (let cat in missions) {
+                for (let mid in missions[cat]) {
+                    missions[cat][mid].tasks.forEach(task => {
+                        t++;
+                        if (task.completed) c++;
+                    });
+                }
+            }
+            let p = t ? Math.round((c / t) * 100) : 0;
+            document.getElementById('progressCircle').textContent = p + '%';
+        }
+
+        // ============ Utility Functions ============
+        function showMessage(t) {
+            let m = document.getElementById('successMessage');
+            document.getElementById('messageText').textContent = t;
+            m.style.display = 'block';
+            setTimeout(() => m.style.display = 'none', 2000);
+        }
+
+        // ============ Initialize ============
+        window.onload = function () {
+            // Show auth modal after 1 second
+            setTimeout(showAuthModal, 1000);
+
+            // Load dark mode preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.top-btn i').className = 'fas fa-sun';
+            }
+
+            // Update UI
+            updateUI();
+            updateProgress();
+
+            // Set up avatar selection for edit modal
+            document.querySelectorAll('#editAvatarSelector .avatar-option').forEach(o => {
+                o.addEventListener('click', function () {
+                    document.querySelectorAll('#editAvatarSelector .avatar-option').forEach(x => x.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            // Close panels when clicking outside
+            document.addEventListener('click', function (e) {
+                let navBar = document.getElementById('navBar');
+                let menuBtn = document.querySelector('.top-btn:last-child');
+                if (!navBar.contains(e.target) && !menuBtn.contains(e.target) && navBar.classList.contains('open')) {
+                    navBar.classList.remove('open');
+                }
+
+                let notPanel = document.getElementById('notificationsPanel');
+                let notBtn = document.getElementById('notificationsButton');
+                if (!notPanel.contains(e.target) && !notBtn.contains(e.target) && notPanel.classList.contains('show')) {
+                    notPanel.classList.remove('show');
+                }
+            });
+
+            // Make alarm draggable
+            let alarmPanel = document.getElementById('alarmPanel');
+            let alarmHeader = document.getElementById('alarmHeader');
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            alarmHeader.onmousedown = function (e) {
+                isDragging = true;
+                let rect = alarmPanel.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                alarmPanel.style.transition = 'none';
+            };
+
+            document.onmousemove = function (e) {
+                if (isDragging) {
+                    let left = e.clientX - offsetX;
+                    let top = e.clientY - offsetY;
+                    left = Math.max(0, Math.min(left, window.innerWidth - alarmPanel.offsetWidth));
+                    top = Math.max(0, Math.min(top, window.innerHeight - alarmPanel.offsetHeight));
+                    alarmPanel.style.left = left + 'px';
+                    alarmPanel.style.top = top + 'px';
+                    alarmPanel.style.transform = 'none';
+                }
+            };
+
+            document.onmouseup = function () {
+                isDragging = false;
+                alarmPanel.style.transition = '';
+            };
+        };
+    </script>
+</body>
+</html>
